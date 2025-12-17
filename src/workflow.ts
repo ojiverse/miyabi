@@ -3,9 +3,10 @@ import {
 	type WorkflowEvent,
 	type WorkflowStep,
 } from "cloudflare:workers";
-import { generateText } from "ai";
+import { generateText, stepCountIs } from "ai";
 import { getModel } from "./lib/ai/factory";
 import { SYSTEM_PROMPT } from "./lib/ai/system";
+import { tools } from "./tools";
 
 type WorkflowParams = {
 	jobId: string;
@@ -55,13 +56,15 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				.run();
 		});
 
-		// Step 2: Generate AI response
+		// Step 2: Generate AI response (with tool calling support)
 		const aiResponse = await step.do("generate-ai-response", async () => {
 			const model = getModel(this.env);
 			const result = await generateText({
 				model,
 				system: SYSTEM_PROMPT,
 				prompt: question,
+				tools,
+				stopWhen: stepCountIs(5), // Allow up to 5 tool call round-trips
 			});
 			return result.text;
 		});
