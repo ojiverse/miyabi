@@ -7,16 +7,23 @@
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
 		"test": "vitest",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types",
+		"register:command": "tsx scripts/register.ts"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "2.3.9",
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"@discordjs/rest": "2.6.0",
+		"dotenv": "17.2.3",
+		"rest": "link:@types/@discordjs/rest",
+		"tsx": "4.21.0",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.55.0"
 	},
 	"dependencies": {
 		"ai": "5.0.114",
+		"discord-api-types": "^0.38.37",
 		"discord-hono": "0.20.1",
 		"hono": "4.11.1",
 		"workers-ai-provider": "2.0.0",
