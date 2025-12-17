@@ -1,0 +1,34 @@
+diff --git a/dist/index.js b/dist/index.js
+index 78d92083e45b4179716f25bb114291f5708afdb9..3c26b63e50291ddcb4d8e0c3dd0cb491bbbfd9ff 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -12629,9 +12629,9 @@ function prepareToolsAndToolChoice(tools, toolChoice) {
+   }
+   const mappedTools = tools.map((tool3) => ({
+     function: {
+-      description: tool3.type === "function" && tool3.description,
++      description: (tool3.type === "function" || tool3.type === void 0) ? tool3.description : void 0,
+       name: tool3.name,
+-      parameters: tool3.type === "function" && tool3.inputSchema
++      parameters: (tool3.type === "function" || tool3.type === void 0) ? tool3.inputSchema : void 0
+     },
+     type: "function"
+   }));
+diff --git a/src/utils.ts b/src/utils.ts
+index ddd4fcb13d9f5b327774b8115b8031fbd07fad80..ce463994a1e40a98ed5a019325a4da46a44e6520 100644
+--- a/src/utils.ts
++++ b/src/utils.ts
+@@ -137,9 +137,11 @@ export function prepareToolsAndToolChoice(
+ 
+ 	const mappedTools = tools.map((tool) => ({
+ 		function: {
+-			description: tool.type === "function" && tool.description,
++			// Fix: AI SDK v5's tool() returns type as undefined, not "function"
++			// So we need to check for both "function" and undefined
++			description: (tool.type === "function" || tool.type === undefined) ? tool.description : undefined,
+ 			name: tool.name,
+-			parameters: tool.type === "function" && tool.inputSchema,
++			parameters: (tool.type === "function" || tool.type === undefined) ? tool.inputSchema : undefined,
+ 		},
+ 		type: "function",
+ 	}));
