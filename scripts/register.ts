@@ -1,4 +1,5 @@
-import { REST, Routes } from "@discordjs/rest";
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v10";
 import * as dotenv from "dotenv";
 import { commands } from "../src/commands";
 
@@ -20,14 +21,14 @@ if (!DISCORD_APPLICATION_ID) {
 }
 
 async function main() {
-	const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
+	const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN as string);
 
 	// Convert discord-hono Command objects to Discord API format
 	const commandsJson = commands.map((cmd) => cmd.toJSON());
 
 	const route = DISCORD_GUILD_ID
-		? Routes.applicationGuildCommands(DISCORD_APPLICATION_ID, DISCORD_GUILD_ID)
-		: Routes.applicationCommands(DISCORD_APPLICATION_ID);
+		? Routes.applicationGuildCommands(DISCORD_APPLICATION_ID as string, DISCORD_GUILD_ID)
+		: Routes.applicationCommands(DISCORD_APPLICATION_ID as string);
 
 	const scope = DISCORD_GUILD_ID ? `guild (${DISCORD_GUILD_ID})` : "global";
 
