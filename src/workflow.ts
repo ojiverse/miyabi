@@ -20,7 +20,7 @@ type WorkflowParams = {
 // Bot configuration for webhook messages
 const BOT_NAME = "Miyabi";
 const BOT_AVATAR_URL =
-	"https://cdn.discordapp.com/embed/avatars/0.png"; // Default Discord avatar
+	"https://cdn.discordapp.com/avatars/1450755873587724323/109a92e86cdc903f15cd3904615c3527.png";
 
 export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 	async run(event: WorkflowEvent<WorkflowParams>, step: WorkflowStep) {
