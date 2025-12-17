@@ -9,6 +9,7 @@ if (!process.env.DISCORD_TOKEN || !process.env.DISCORD_APPLICATION_ID) {
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const DISCORD_APPLICATION_ID = process.env.DISCORD_APPLICATION_ID;
+const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID; // Optional: for guild-specific commands
 
 if (!DISCORD_TOKEN) {
 	throw new Error("DISCORD_TOKEN is required");
@@ -37,14 +38,18 @@ const commands = [
 async function main() {
 	const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
 
+	const route = DISCORD_GUILD_ID
+		? Routes.applicationGuildCommands(DISCORD_APPLICATION_ID, DISCORD_GUILD_ID)
+		: Routes.applicationCommands(DISCORD_APPLICATION_ID);
+
+	const scope = DISCORD_GUILD_ID ? `guild (${DISCORD_GUILD_ID})` : "global";
+
 	try {
-		console.log("Started refreshing application (/) commands...");
+		console.log(`Started refreshing ${scope} application (/) commands...`);
 
-		await rest.put(Routes.applicationCommands(DISCORD_APPLICATION_ID), {
-			body: commands,
-		});
+		await rest.put(route, { body: commands });
 
-		console.log("Successfully reloaded application (/) commands.");
+		console.log(`Successfully reloaded ${scope} application (/) commands.`);
 	} catch (error) {
 		console.error("Failed to register commands:", error);
 		process.exit(1);
