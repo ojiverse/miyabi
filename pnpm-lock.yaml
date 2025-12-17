@@ -11,6 +11,9 @@ importers:
       ai:
         specifier: 5.0.114
         version: 5.0.114(zod@4.2.1)
+      discord-api-types:
+        specifier: ^0.38.37
+        version: 0.38.37
       discord-hono:
         specifier: 0.20.1
         version: 0.20.1
@@ -988,6 +991,9 @@ packages:
   devalue@5.6.1:
     resolution: {integrity: sha512-jDwizj+IlEZBunHcOuuFVBnIMPAEHvTsJj0BcIp94xYguLRVBcXO853px/MyIJvbVzWdsGvrRweIUWJw8hBP7A==}
 
+  discord-api-types@0.38.37:
+    resolution: {integrity: sha512-Cv47jzY1jkGkh5sv0bfHYqGgKOWO1peOrGMkDFM4UmaGMOTgOW8QSexhvixa9sVOiz8MnVOBryWYyw/CEVhj7w==}
+
   discord-hono@0.20.1:
     resolution: {integrity: sha512-CQagnJFIqY5Y8K297fH0H1E4ght/YSOH9lWIN1kjVW3lcYyXaOsKK+8+fO3sNaqnfhXMulikFp/P9AtXmWEtfA==}
     engines: {node: '>=18.4.0'}
@@ -1955,6 +1961,8 @@ snapshots:
   detect-libc@2.1.2: {}
 
   devalue@5.6.1: {}
+
+  discord-api-types@0.38.37: {}
 
   discord-hono@0.20.1: {}
 

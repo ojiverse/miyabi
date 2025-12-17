@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"ai": "5.0.114",
+		"discord-api-types": "^0.38.37",
 		"discord-hono": "0.20.1",
 		"hono": "4.11.1",
 		"workers-ai-provider": "2.0.0",
