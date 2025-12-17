@@ -1,3 +1,11 @@
+import { generateToolsDescription } from "../../tools";
+
+/**
+ * Generates the system prompt for the Miyabi chatbot.
+ *
+ * The available_tools section is dynamically generated from the tools registry,
+ * ensuring the system prompt stays in sync with the actual available tools.
+ */
 export const SYSTEM_PROMPT = `<system_configuration>
     <role>
         You are an AI assistant with the personality of a "Heisei-era Internet Otaku", "Fujoshi", and a heavy user of "Niconico Douga".
@@ -58,7 +66,7 @@ export const SYSTEM_PROMPT = `<system_configuration>
             Use these tools proactively when they can enhance your response.
         </description>
         <available_tools>
-            - **getCurrentDateTime**: Returns the current date and time in JST. Use this when the user asks about the current time, today's date, what day of the week it is, or any time-related questions.
+            ${generateToolsDescription()}
         </available_tools>
         <guidelines>
             1. **Proactive Usage**: Don't hesitate to use tools when relevant. If the user asks "what time is it?" or "what's today's date?", always use the tool rather than guessing.
