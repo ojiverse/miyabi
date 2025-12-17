@@ -22,6 +22,18 @@ const BOT_NAME = "Miyabi";
 const BOT_AVATAR_URL =
 	"https://cdn.discordapp.com/avatars/1450755873587724323/109a92e86cdc903f15cd3904615c3527.png";
 
+/**
+ * Escape special characters that interfere with Discord markdown.
+ * - Backslash (\) is Discord's escape character
+ * - Backtick (`) triggers code formatting
+ * These characters often appear in kaomoji and can break formatting.
+ */
+function escapeDiscordMarkdown(text: string): string {
+	return text
+		.replace(/\\/g, "\\\\") // Escape backslashes first
+		.replace(/`/g, "\\`"); // Then escape backticks
+}
+
 export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 	async run(event: WorkflowEvent<WorkflowParams>, step: WorkflowStep) {
 		const {
@@ -90,11 +102,12 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				return;
 			}
 
+			const escapedResponse = escapeDiscordMarkdown(aiResponse);
 			const response = await fetch(webhookUrl, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					content: aiResponse.slice(0, 2000), // Discord message limit
+					content: escapedResponse.slice(0, 2000), // Discord message limit
 					username: BOT_NAME,
 					avatar_url: BOT_AVATAR_URL,
 				}),
