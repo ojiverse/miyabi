@@ -36,9 +36,15 @@ importers:
       '@discordjs/rest':
         specifier: 2.6.0
         version: 2.6.0
+      '@types/dotenv':
+        specifier: 8.2.3
+        version: 8.2.3
       dotenv:
         specifier: 17.2.3
         version: 17.2.3
+      rest:
+        specifier: link:@types/@discordjs/rest
+        version: link:@types/@discordjs/rest
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@25.0.3)(typescript@5.9.3)
@@ -970,6 +976,10 @@ packages:
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
+
+  '@types/dotenv@8.2.3':
+    resolution: {integrity: sha512-g2FXjlDX/cYuc5CiQvyU/6kkbP1JtmGzh0obW50zD7OKeILVL0NSpPWLXVfqoAGQjom2/SLLx9zHq0KXvD6mbw==}
+    deprecated: This is a stub types definition. dotenv provides its own type definitions, so you do not need this installed.
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -2070,6 +2080,10 @@ snapshots:
       assertion-error: 2.0.1
 
   '@types/deep-eql@4.0.2': {}
+
+  '@types/dotenv@8.2.3':
+    dependencies:
+      dotenv: 17.2.3
 
   '@types/estree@1.0.8': {}
 
