@@ -1,2 +1,0 @@
-patchedDependencies:
-  workers-ai-provider@2.0.0: patches/workers-ai-provider@2.0.0.patch

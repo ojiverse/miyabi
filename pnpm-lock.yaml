@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  workers-ai-provider@2.0.0:
-    hash: 94cbab42189fd402ff94ab0773b3e1777e8d3d3345bc135a9cccfe4c904b551c
-    path: patches/workers-ai-provider@2.0.0.patch
-
 importers:
 
   .:
@@ -27,7 +22,7 @@ importers:
         version: 4.11.1
       workers-ai-provider:
         specifier: 2.0.0
-        version: 2.0.0(patch_hash=94cbab42189fd402ff94ab0773b3e1777e8d3d3345bc135a9cccfe4c904b551c)(zod@4.2.1)
+        version: 2.0.0(zod@4.2.1)
       zod:
         specifier: 4.2.1
         version: 4.2.1
@@ -2573,7 +2568,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20251213.0
       '@cloudflare/workerd-windows-64': 1.20251213.0
 
-  workers-ai-provider@2.0.0(patch_hash=94cbab42189fd402ff94ab0773b3e1777e8d3d3345bc135a9cccfe4c904b551c)(zod@4.2.1):
+  workers-ai-provider@2.0.0(zod@4.2.1):
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.19(zod@4.2.1)
