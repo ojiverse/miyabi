@@ -5,6 +5,7 @@ import {
 } from "cloudflare:workers";
 import { generateText } from "ai";
 import { getModel } from "./lib/ai/factory";
+import { SYSTEM_PROMPT } from "./lib/ai/system";
 
 type WorkflowParams = {
 	jobId: string;
@@ -32,6 +33,7 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 			const model = getModel(this.env);
 			const result = await generateText({
 				model,
+				system: SYSTEM_PROMPT,
 				prompt: question,
 			});
 			return result.text;
