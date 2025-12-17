@@ -20,6 +20,30 @@ discord.command("ask", async (c) => {
 	const interactionToken = interaction.token;
 	const applicationId = c.env.DISCORD_APPLICATION_ID;
 
+	// Extract user info for webhook impersonation
+	const member = interaction.member;
+	const user = member?.user;
+	const guildId = interaction.guild_id;
+
+	// Get display name (nickname > global_name > username)
+	const displayName =
+		member?.nick ?? user?.global_name ?? user?.username ?? "Unknown User";
+
+	// Build user avatar URL (PNG format with size parameter)
+	// Priority: guild avatar > user avatar > default avatar
+	let userAvatarUrl: string | undefined;
+	if (member?.avatar && guildId && user?.id) {
+		// Guild-specific avatar
+		userAvatarUrl = `https://cdn.discordapp.com/guilds/${guildId}/users/${user.id}/avatars/${member.avatar}.png?size=256`;
+	} else if (user?.avatar && user?.id) {
+		// User's global avatar
+		userAvatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=256`;
+	} else if (user?.id) {
+		// Default avatar based on user ID
+		const defaultAvatarIndex = Number(BigInt(user.id) >> 22n) % 6;
+		userAvatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
+	}
+
 	// Generate a unique job ID
 	const jobId = crypto.randomUUID();
 
@@ -37,11 +61,14 @@ discord.command("ask", async (c) => {
 			question,
 			interactionToken,
 			applicationId,
+			webhookUrl: c.env.DISCORD_WEBHOOK_URL,
+			userDisplayName: displayName,
+			userAvatarUrl,
 		},
 	});
 
-	// Return deferred response (Type 5)
-	return c.resDefer();
+	// Return deferred response (ephemeral so it's hidden from other users)
+	return c.flags("EPHEMERAL").resDefer();
 });
 
 // Main Hono application
@@ -66,6 +93,9 @@ app.get("/debug", async (c) => {
 			question: prompt,
 			interactionToken: "DEBUG_TOKEN",
 			applicationId: "DEBUG",
+			webhookUrl: "DEBUG_WEBHOOK",
+			userDisplayName: "Debug User",
+			userAvatarUrl: undefined,
 		},
 	});
 
