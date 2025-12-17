@@ -73,34 +73,6 @@ discord.command("ask", async (c) => {
 // Main Hono application
 const app = new Hono<{ Bindings: Env }>();
 
-// Debug endpoint for local testing without Discord
-app.get("/debug", async (c) => {
-	const prompt = c.req.query("prompt") ?? "Hello";
-	const jobId = crypto.randomUUID();
-
-	// Insert job into D1 database
-	await c.env.miyabi_db
-		.prepare("INSERT INTO jobs (id, token, status) VALUES (?, ?, ?)")
-		.bind(jobId, "DEBUG_TOKEN", "PENDING")
-		.run();
-
-	// Trigger workflow with debug token
-	await c.env.miyabi_workflow.create({
-		id: jobId,
-		params: {
-			jobId,
-			question: prompt,
-			interactionToken: "DEBUG_TOKEN",
-			applicationId: "DEBUG",
-			webhookUrl: "DEBUG_WEBHOOK",
-			userDisplayName: "Debug User",
-			userAvatarUrl: undefined,
-		},
-	});
-
-	return c.json({ status: "Debug triggered", jobId });
-});
-
 // Delegate all other requests to Discord handler
 app.all("*", (c) => discord.fetch(c.req.raw, c.env, c.executionCtx));
 
