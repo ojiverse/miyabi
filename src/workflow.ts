@@ -15,7 +15,9 @@ type WorkflowParams = {
 
 export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 	async run(event: WorkflowEvent<WorkflowParams>, step: WorkflowStep) {
-		const { jobId, question, interactionToken, applicationId } = event.payload;
+		const { jobId, question, interactionToken, applicationId } =
+			event.payload;
+		const isDebug = interactionToken === "DEBUG_TOKEN";
 
 		// Step 1: Update job status to PROCESSING
 		await step.do("update-status-processing", async () => {
@@ -35,8 +37,15 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 			return result.text;
 		});
 
-		// Step 3: Send response to Discord via webhook
+		// Step 3: Send response to Discord via webhook (skip in debug mode)
 		await step.do("send-discord-response", async () => {
+			if (isDebug) {
+				// Debug mode: log result to console instead of sending to Discord
+				console.log("DEBUG RESULT:", aiResponse);
+				return;
+			}
+
+			// Production: send to Discord webhook
 			const webhookUrl = `https://discord.com/api/v10/webhooks/${applicationId}/${interactionToken}/messages/@original`;
 
 			const response = await fetch(webhookUrl, {
@@ -51,7 +60,9 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 
 			if (!response.ok) {
 				const errorText = await response.text();
-				throw new Error(`Discord API error: ${response.status} - ${errorText}`);
+				throw new Error(
+					`Discord API error: ${response.status} - ${errorText}`,
+				);
 			}
 		});
 
