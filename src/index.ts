@@ -15,8 +15,7 @@ discord.command("ask", async (c) => {
 	const options = interaction.data.options as
 		| APIApplicationCommandInteractionDataStringOption[]
 		| undefined;
-	const question =
-		options?.find((opt) => opt.name === "question")?.value ?? "";
+	const question = options?.find((opt) => opt.name === "question")?.value ?? "";
 	const interactionToken = interaction.token;
 	const applicationId = c.env.DISCORD_APPLICATION_ID;
 

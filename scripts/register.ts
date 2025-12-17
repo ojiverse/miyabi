@@ -27,7 +27,10 @@ async function main() {
 	const commandsJson = commands.map((cmd) => cmd.toJSON());
 
 	const route = DISCORD_GUILD_ID
-		? Routes.applicationGuildCommands(DISCORD_APPLICATION_ID as string, DISCORD_GUILD_ID)
+		? Routes.applicationGuildCommands(
+				DISCORD_APPLICATION_ID as string,
+				DISCORD_GUILD_ID,
+			)
 		: Routes.applicationCommands(DISCORD_APPLICATION_ID as string);
 
 	const scope = DISCORD_GUILD_ID ? `guild (${DISCORD_GUILD_ID})` : "global";
