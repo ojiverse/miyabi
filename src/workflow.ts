@@ -63,9 +63,9 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				model,
 				system: SYSTEM_PROMPT,
 				prompt: question,
-				// TODO: Re-enable tools after debugging function calling issue
-				// tools,
-				// stopWhen: stepCountIs(5), // Allow up to 5 tool call round-trips
+				tools,
+				toolChoice: "auto",
+				stopWhen: stepCountIs(5), // Allow up to 5 tool call round-trips
 			});
 			return result.text;
 		});
