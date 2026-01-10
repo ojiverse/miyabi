@@ -106,13 +106,23 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				},
 			);
 
-			// Extract response text
+			// Extract response text from various formats
 			if (typeof result === "string") {
 				return result;
 			}
+			// OpenAI-compatible format (Qwen3, etc.)
+			if (
+				"choices" in result &&
+				Array.isArray(result.choices) &&
+				result.choices[0]?.message?.content
+			) {
+				return result.choices[0].message.content;
+			}
+			// Workers AI native format
 			if ("response" in result && typeof result.response === "string") {
 				return result.response;
 			}
+			console.log("Unexpected result format:", JSON.stringify(result));
 			return JSON.stringify(result);
 		});
 
