@@ -4,6 +4,7 @@ import {
 	type WorkflowStep,
 } from "cloudflare:workers";
 import { runWithTools } from "@cloudflare/ai-utils";
+import { type CloudflareTool, defaultAdapter } from "./lib/ai/adapters";
 import { SYSTEM_PROMPT } from "./lib/ai/system";
 
 type WorkflowParams = {
@@ -57,15 +58,15 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 		// Step 2: Generate AI response (with tool calling support via @cloudflare/ai-utils)
 		const aiResponse = await step.do("generate-ai-response", async () => {
 			// Define tools in @cloudflare/ai-utils format
-			const cfTools = [
+			const tools: CloudflareTool[] = [
 				{
 					name: "getCurrentDateTime",
 					description:
 						"Returns the current date and time. Use this when asked about the current time, today's date, what day it is, or any time-related questions.",
 					parameters: {
-						type: "object" as const,
+						type: "object",
 						properties: {},
-						required: [] as string[],
+						required: [],
 					},
 					function: async () => {
 						const now = new Date();
@@ -92,13 +93,13 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 
 			const result = await runWithTools(
 				this.env.AI,
-				"@cf/qwen/qwen3-30b-a3b-fp8",
+				defaultAdapter.modelId,
 				{
 					messages: [
 						{ role: "system", content: SYSTEM_PROMPT },
 						{ role: "user", content: question },
 					],
-					tools: cfTools,
+					tools,
 				},
 				{
 					maxRecursiveToolRuns: 5,
@@ -106,24 +107,7 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				},
 			);
 
-			// Extract response text from various formats
-			if (typeof result === "string") {
-				return result;
-			}
-			// OpenAI-compatible format (Qwen3, etc.)
-			if (
-				"choices" in result &&
-				Array.isArray(result.choices) &&
-				result.choices[0]?.message?.content
-			) {
-				return result.choices[0].message.content;
-			}
-			// Workers AI native format
-			if ("response" in result && typeof result.response === "string") {
-				return result.response;
-			}
-			console.log("Unexpected result format:", JSON.stringify(result));
-			return JSON.stringify(result);
+			return defaultAdapter.extractResponse(result);
 		});
 
 		// Step 3: Post user's message via webhook (impersonation)
