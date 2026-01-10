@@ -3,10 +3,9 @@ import {
 	type WorkflowEvent,
 	type WorkflowStep,
 } from "cloudflare:workers";
-import { generateText, stepCountIs } from "ai";
-import { getModel } from "./lib/ai/factory";
+import { runWithTools } from "@cloudflare/ai-utils";
+import { type CloudflareTool, defaultAdapter } from "./lib/ai/adapters";
 import { SYSTEM_PROMPT } from "./lib/ai/system";
-import { tools } from "./tools";
 
 type WorkflowParams = {
 	jobId: string;
@@ -56,17 +55,59 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				.run();
 		});
 
-		// Step 2: Generate AI response (with tool calling support)
+		// Step 2: Generate AI response (with tool calling support via @cloudflare/ai-utils)
 		const aiResponse = await step.do("generate-ai-response", async () => {
-			const model = getModel(this.env);
-			const result = await generateText({
-				model,
-				system: SYSTEM_PROMPT,
-				prompt: question,
-				tools,
-				stopWhen: stepCountIs(5), // Allow up to 5 tool call round-trips
-			});
-			return result.text;
+			// Define tools in @cloudflare/ai-utils format
+			const tools: CloudflareTool[] = [
+				{
+					name: "getCurrentDateTime",
+					description:
+						"Returns the current date and time. Use this when asked about the current time, today's date, what day it is, or any time-related questions.",
+					parameters: {
+						type: "object",
+						properties: {},
+						required: [],
+					},
+					function: async () => {
+						const now = new Date();
+						const jstFormatter = new Intl.DateTimeFormat("ja-JP", {
+							timeZone: "Asia/Tokyo",
+							year: "numeric",
+							month: "2-digit",
+							day: "2-digit",
+							weekday: "long",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false,
+						});
+						const jstTime = jstFormatter.format(now);
+						return JSON.stringify({
+							jst: jstTime,
+							iso: now.toISOString(),
+							timezone: "Asia/Tokyo (JST)",
+						});
+					},
+				},
+			];
+
+			const result = await runWithTools(
+				this.env.AI,
+				defaultAdapter.modelId,
+				{
+					messages: [
+						{ role: "system", content: SYSTEM_PROMPT },
+						{ role: "user", content: question },
+					],
+					tools,
+				},
+				{
+					maxRecursiveToolRuns: 5,
+					verbose: true,
+				},
+			);
+
+			return defaultAdapter.extractResponse(result);
 		});
 
 		// Step 3: Post user's message via webhook (impersonation)
