@@ -27,11 +27,9 @@
 	},
 	"dependencies": {
 		"@cloudflare/ai-utils": "^1.0.1",
-		"ai": "6.0.26",
 		"discord-api-types": "^0.38.37",
 		"discord-hono": "0.20.1",
 		"hono": "4.11.1",
-		"workers-ai-provider": "3.0.2",
 		"zod": "4.2.1"
 	}
 }

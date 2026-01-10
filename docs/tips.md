@@ -76,17 +76,55 @@ const result = await runWithTools(
 
 ### Model Recommendations for Function Calling
 
-| Model | Function Calling | Notes |
-|-------|------------------|-------|
-| `@hf/nousresearch/hermes-2-pro-mistral-7b` | ✅ Works | Recommended for function calling, 7B size |
-| `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | ❌ Broken | Does not work with AI SDK, returns JSON as text |
+| Model | Size | Function Calling | Response Format | Notes |
+|-------|------|------------------|-----------------|-------|
+| `@cf/qwen/qwen3-30b-a3b-fp8` | 30B | ✅ Works | OpenAI-compatible | **Recommended** - Good balance of quality and cost |
+| `@cf/mistral/mistral-small-3.1-24b-instruct` | 24B | ✅ Works | OpenAI-compatible | 128k context window |
+| `@hf/nousresearch/hermes-2-pro-mistral-7b` | 7B | ✅ Works | Native | Fine-tuned for function calling, budget option |
+| `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | 70B | ❌ Broken | N/A | Does not work with AI SDK, returns JSON as text |
+
+### Response Format Differences
+
+Different models return responses in different formats:
+
+**Native Workers AI format:**
+```json
+{ "response": "Hello!" }
+```
+
+**OpenAI-compatible format (Qwen3, Mistral, etc.):**
+```json
+{
+  "choices": [{
+    "message": { "content": "Hello!" }
+  }]
+}
+```
+
+We implemented an **Adapter pattern** to handle these differences:
+
+```typescript
+// src/lib/ai/adapters/types.ts
+export interface ModelAdapter {
+  readonly modelId: string;
+  extractResponse(output: AiTextGenerationOutput): string;
+}
+
+// src/lib/ai/adapters/index.ts
+export const defaultAdapter = new Qwen3Adapter();  // Change this to switch models
+```
 
 ### Cost Considerations
 
-- `hermes-2-pro-mistral-7b` (7B) is significantly cheaper than Llama 3.3 70B
-- Llama 3.3 70B: Input $0.293/M tokens, Output $2.253/M tokens
-- 7B models are typically ~1/10 the cost of 70B models
+- `qwen3-30b-a3b-fp8` (30B) - Good quality, moderate cost
+- `hermes-2-pro-mistral-7b` (7B) - Budget option, lower quality
+- Llama 3.3 70B: Input $0.293/M tokens, Output $2.253/M tokens (but doesn't work!)
 
 ### Conclusion
 
-If you need function calling with Cloudflare Workers AI, use `@cloudflare/ai-utils` with `hermes-2-pro-mistral-7b`. Do not use the AI SDK with `workers-ai-provider` for Llama models - the function calling implementation is incompatible.
+For function calling with Cloudflare Workers AI:
+
+1. **Use `@cloudflare/ai-utils`** with `runWithTools` - not the Vercel AI SDK
+2. **Choose a compatible model** - Qwen3 30B recommended for quality, Hermes 7B for budget
+3. **Use the Adapter pattern** - Handle response format differences cleanly
+4. **Avoid Llama models** for function calling - they have compatibility issues
