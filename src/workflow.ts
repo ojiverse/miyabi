@@ -67,6 +67,14 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 				toolChoice: "auto",
 				stopWhen: stepCountIs(5), // Allow up to 5 tool call round-trips
 			});
+
+			// Debug: Log the full result structure
+			console.log("=== generateText result ===");
+			console.log("text:", result.text);
+			console.log("steps:", JSON.stringify(result.steps, null, 2));
+			console.log("toolCalls:", JSON.stringify(result.toolCalls, null, 2));
+			console.log("toolResults:", JSON.stringify(result.toolResults, null, 2));
+
 			return result.text;
 		});
 
