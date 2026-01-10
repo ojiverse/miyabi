@@ -28,6 +28,31 @@ export type CloudflareTool = {
 };
 
 /**
+ * Example for tool usage in system prompt
+ */
+export type ToolExample = {
+	userQuery: string;
+	toolResponse?: string;
+	goodResponse: string;
+};
+
+/**
+ * Tool documentation for system prompt generation
+ */
+export type ToolPromptInfo = {
+	description: string;
+	whenToUse: string[];
+	examples: ToolExample[];
+};
+
+/**
+ * Tool with prompt information for system prompt generation
+ */
+export type ToolWithPrompt = CloudflareTool & {
+	promptInfo: ToolPromptInfo;
+};
+
+/**
  * Model adapter interface for abstracting model-specific behavior
  */
 export interface ModelAdapter {

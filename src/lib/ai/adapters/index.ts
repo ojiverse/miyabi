@@ -1,6 +1,12 @@
 export { HermesAdapter } from "./hermes";
 export { Qwen3Adapter } from "./qwen3";
-export type { CloudflareTool, ModelAdapter } from "./types";
+export type {
+	CloudflareTool,
+	ModelAdapter,
+	ToolExample,
+	ToolPromptInfo,
+	ToolWithPrompt,
+} from "./types";
 
 import { Qwen3Adapter } from "./qwen3";
 

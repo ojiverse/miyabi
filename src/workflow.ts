@@ -4,8 +4,8 @@ import {
 	type WorkflowStep,
 } from "cloudflare:workers";
 import { runWithTools } from "@cloudflare/ai-utils";
-import { type CloudflareTool, defaultAdapter } from "./lib/ai/adapters";
-import { SYSTEM_PROMPT } from "./lib/ai/system";
+import { defaultAdapter, type ToolWithPrompt } from "./lib/ai/adapters";
+import { createSystemPrompt } from "./lib/ai/system";
 import { createWeatherTool } from "./lib/tools";
 
 type WorkflowParams = {
@@ -58,50 +58,28 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 
 		// Step 2: Generate AI response (with tool calling support via @cloudflare/ai-utils)
 		const aiResponse = await step.do("generate-ai-response", async () => {
-			// Define tools in @cloudflare/ai-utils format
-			const tools: CloudflareTool[] = [
-				{
-					name: "getCurrentDateTime",
-					description:
-						"Returns the current date and time. Use this when asked about the current time, today's date, what day it is, or any time-related questions.",
-					parameters: {
-						type: "object",
-						properties: {},
-						required: [],
-					},
-					function: async (_args: Record<string, unknown>) => {
-						const now = new Date();
-						const jstFormatter = new Intl.DateTimeFormat("ja-JP", {
-							timeZone: "Asia/Tokyo",
-							year: "numeric",
-							month: "2-digit",
-							day: "2-digit",
-							weekday: "long",
-							hour: "2-digit",
-							minute: "2-digit",
-							second: "2-digit",
-							hour12: false,
-						});
-						const jstTime = jstFormatter.format(now);
-						return JSON.stringify({
-							jst: jstTime,
-							iso: now.toISOString(),
-							timezone: "Asia/Tokyo (JST)",
-						});
-					},
-				},
-				createWeatherTool(),
-			];
+			// Define tools with prompt info for system prompt generation
+			const tools: ToolWithPrompt[] = [createWeatherTool()];
+
+			// Extract only CloudflareTool properties for runWithTools
+			const cloudflareTools = tools.map(
+				({ name, description, parameters, function: fn }) => ({
+					name,
+					description,
+					parameters,
+					function: fn,
+				}),
+			);
 
 			const result = await runWithTools(
 				this.env.AI,
 				defaultAdapter.modelId,
 				{
 					messages: [
-						{ role: "system", content: SYSTEM_PROMPT },
+						{ role: "system", content: createSystemPrompt(tools) },
 						{ role: "user", content: question },
 					],
-					tools,
+					tools: cloudflareTools,
 				},
 				{
 					maxRecursiveToolRuns: 5,

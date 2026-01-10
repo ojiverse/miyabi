@@ -1,4 +1,4 @@
-import type { CloudflareTool } from "../ai/adapters/types";
+import type { ToolWithPrompt } from "../ai/adapters/types";
 
 /**
  * WMO Weather interpretation codes mapped to Japanese descriptions
@@ -115,7 +115,7 @@ function getWeatherCondition(code: number): string {
 /**
  * Create the weather tool for use with @cloudflare/ai-utils
  */
-export function createWeatherTool(): CloudflareTool {
+export function createWeatherTool(): ToolWithPrompt {
 	return {
 		name: "getWeather",
 		description:
@@ -130,6 +130,22 @@ export function createWeatherTool(): CloudflareTool {
 				},
 			},
 			required: ["cityName"],
+		},
+		promptInfo: {
+			description:
+				"Returns the current weather for a specified city including temperature, conditions, humidity, and wind speed. Requires a cityName parameter.",
+			whenToUse: [
+				'User asks about weather in a specific city (e.g., "東京の天気は？", "What\'s the weather in Tokyo?", "大阪は今何度？")',
+			],
+			examples: [
+				{
+					userQuery: "東京の天気は？",
+					toolResponse:
+						'{"success": true, "data": {"cityName": "東京", "country": "日本", "temperature": 18.5, "condition": "快晴", "humidity": 45, "windSpeed": 12.5, "timezone": "Asia/Tokyo"}}',
+					goodResponse:
+						"東京は今18.5℃で快晴だゾ！(´ω｀) 湿度45%で風速12.5km/hだから、お出かけ日和だねwww",
+				},
+			],
 		},
 		function: async (args: Record<string, unknown>): Promise<string> => {
 			const cityName = args.cityName as string | undefined;
