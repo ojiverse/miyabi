@@ -11,7 +11,12 @@ import { z } from "zod";
 export const getCurrentDateTime = tool({
 	description:
 		"Returns the current date and time. Use this when asked about the current time, today's date, what day it is, or any time-related questions.",
-	inputSchema: z.object({}),
+	inputSchema: z.object({
+		_unused: z
+			.string()
+			.optional()
+			.describe("Unused parameter for schema compatibility"),
+	}),
 	execute: async () => {
 		const now = new Date();
 
