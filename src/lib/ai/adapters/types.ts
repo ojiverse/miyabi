@@ -24,7 +24,7 @@ export type CloudflareTool = {
 		properties: Record<string, unknown>;
 		required: string[];
 	};
-	function: () => Promise<string>;
+	function: (args: Record<string, unknown>) => Promise<string>;
 };
 
 /**

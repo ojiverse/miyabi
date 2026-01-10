@@ -6,6 +6,7 @@ import {
 import { runWithTools } from "@cloudflare/ai-utils";
 import { type CloudflareTool, defaultAdapter } from "./lib/ai/adapters";
 import { SYSTEM_PROMPT } from "./lib/ai/system";
+import { createWeatherTool } from "./lib/tools";
 
 type WorkflowParams = {
 	jobId: string;
@@ -68,7 +69,7 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 						properties: {},
 						required: [],
 					},
-					function: async () => {
+					function: async (_args: Record<string, unknown>) => {
 						const now = new Date();
 						const jstFormatter = new Intl.DateTimeFormat("ja-JP", {
 							timeZone: "Asia/Tokyo",
@@ -89,6 +90,7 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 						});
 					},
 				},
+				createWeatherTool(),
 			];
 
 			const result = await runWithTools(
