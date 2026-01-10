@@ -92,7 +92,7 @@ export class MiyabiWorkflow extends WorkflowEntrypoint<Env, WorkflowParams> {
 
 			const result = await runWithTools(
 				this.env.AI,
-				"@hf/nousresearch/hermes-2-pro-mistral-7b",
+				"@cf/qwen/qwen3-30b-a3b-fp8",
 				{
 					messages: [
 						{ role: "system", content: SYSTEM_PROMPT },
